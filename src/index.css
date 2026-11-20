@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+
+:root {
+  --cream: #faf7f0;
+  --blush-pale: #f7edf1;
+  --blush: #edceda;
+  --lavender: #cfc7df;
+  --lavender-dark: #9a8ca8;
+  --rose: #c98da8;
+  --rose-dark: #a56a86;
+  --plum: #4f3044;
+  --muted-plum: #76566b;
+  --text: #625361;
+  --line: rgba(79, 48, 68, 0.14);
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--cream);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background:
+    linear-gradient(rgba(79, 48, 68, 0.018) 1px, transparent 1px),
+    var(--cream);
+  background-size: 100% 32px;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid rgba(154, 112, 133, 0.55);
+  outline-offset: 4px;
+}
+
+img {
+  max-width: 100%;
+}
+
+::selection {
+  color: var(--plum);
+  background: var(--blush);
+}

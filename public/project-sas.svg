@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <rect width="600" height="400" rx="28" fill="#eadce5"/>
+  <rect x="180" y="34" width="240" height="332" rx="30" fill="#fffaf7" stroke="#7c5a70" stroke-width="4"/>
+  <rect x="206" y="82" width="188" height="188" rx="16" fill="#4f3044"/>
+  <rect x="228" y="104" width="144" height="144" rx="8" fill="#d9d2e7"/>
+  <rect x="252" y="128" width="96" height="96" rx="8" fill="#fffaf7"/>
+  <rect x="275" y="151" width="50" height="50" rx="6" fill="#c98da8"/>
+  <text x="300" y="328" fill="#4f3044" font-family="Georgia, serif" font-size="34" text-anchor="middle">SAS</text>
+</svg>

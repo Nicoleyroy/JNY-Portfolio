@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1440" viewBox="0 0 1024 1440">
+  <rect width="1024" height="1440" rx="160" fill="#4f3044"/>
+  <circle cx="512" cy="720" r="300" fill="none" stroke="#f1dbe5" stroke-width="8" opacity=".45"/>
+  <circle cx="512" cy="720" r="230" fill="none" stroke="#ddd7eb" stroke-width="3" opacity=".35"/>
+  <text x="512" y="670" fill="#fffaf7" font-family="Georgia, serif" font-size="150" text-anchor="middle">JNY</text>
+  <text x="512" y="790" fill="#f1dbe5" font-family="Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="8" text-anchor="middle">BUILD · LEARN · CREATE</text>
+</svg>
