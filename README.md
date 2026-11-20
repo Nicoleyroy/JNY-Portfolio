@@ -17,3 +17,4 @@ Update the name, headline, contact details, skills, and project details in `src/
 - `npm run dev`
 - `npm run build`
 # JNY-Portfolio
+# JNY-Portfolio
