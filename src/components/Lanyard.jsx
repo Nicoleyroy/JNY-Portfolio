@@ -709,6 +709,7 @@ const Lanyard = ({
   cardColor = '#ffffff',
   orientation = 'portrait',
   finish = 'glossy',
+  backFinish,
   cornerRadius = 0.3,
   size = 0.6,
   anchor = 'center',
@@ -737,6 +738,7 @@ const Lanyard = ({
     cardColor,
     orientation: orientation === 'landscape' ? 'landscape' : 'portrait',
     finish,
+    backFinish,
     cornerRadius,
     size,
     anchor,
@@ -799,15 +801,17 @@ const Lanyard = ({
     strapTexture.wrapT = THREE.RepeatWrapping;
     const grain = buildGrainTexture();
     const weave = buildWeaveTexture();
-    const foilUniforms = {
+    const createFoilUniforms = () => ({
       foilStrength: { value: 0 },
       foilAspect: { value: 1.4 },
       foilKey: { value: new THREE.Vector3() },
       foilFill: { value: new THREE.Vector3() },
       foilTop: { value: new THREE.Vector3() }
-    };
-    const injectFoil = shader => {
-      Object.assign(shader.uniforms, foilUniforms);
+    });
+    const frontFoilUniforms = createFoilUniforms();
+    const backFoilUniforms = createFoilUniforms();
+    const injectFoil = (uniforms, shader) => {
+      Object.assign(shader.uniforms, uniforms);
       shader.vertexShader = shader.vertexShader
         .replace('#include <common>', `#include <common>\n${FOIL_VERTEX_HEAD}`)
         .replace('#include <project_vertex>', `#include <project_vertex>\n${FOIL_VERTEX_BODY}`);
@@ -826,8 +830,8 @@ const Lanyard = ({
       normalMap: grain,
       normalScale: new THREE.Vector2(0.06, 0.06)
     });
-    frontMaterial.onBeforeCompile = injectFoil;
-    backMaterial.onBeforeCompile = injectFoil;
+    frontMaterial.onBeforeCompile = shader => injectFoil(frontFoilUniforms, shader);
+    backMaterial.onBeforeCompile = shader => injectFoil(backFoilUniforms, shader);
     const edgeMaterial = new THREE.MeshPhysicalMaterial();
     const metalMaterial = new THREE.MeshStandardMaterial({ metalness: 1 });
     const bandMaterial = new THREE.MeshPhysicalMaterial({
@@ -924,9 +928,11 @@ const Lanyard = ({
       camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();
       camera.updateMatrixWorld();
-      foilUniforms.foilKey.value.set(-2.5, 4, 6).normalize().transformDirection(camera.matrixWorldInverse);
-      foilUniforms.foilFill.value.set(3, -1, 4).normalize().transformDirection(camera.matrixWorldInverse);
-      foilUniforms.foilTop.value.set(0.5, 4.5, 8).normalize().transformDirection(camera.matrixWorldInverse);
+      [frontFoilUniforms, backFoilUniforms].forEach(uniforms => {
+        uniforms.foilKey.value.set(-2.5, 4, 6).normalize().transformDirection(camera.matrixWorldInverse);
+        uniforms.foilFill.value.set(3, -1, 4).normalize().transformDirection(camera.matrixWorldInverse);
+        uniforms.foilTop.value.set(0.5, 4.5, 8).normalize().transformDirection(camera.matrixWorldInverse);
+      });
       const anchorX = ((ANCHORS[s.anchor] ?? 0.5) - 0.5) * viewWidth;
       const anchorY = viewHeight / 2 + 0.2;
       const cardTop = viewHeight / 2 - viewHeight * mix(0.12, 0.42, clamp(s.strapLength, 0, 1));
@@ -986,20 +992,24 @@ const Lanyard = ({
       if (faceKey !== applied.faceKey) paintFaces();
       if (s.strapColor !== applied.strapColor) repaintStrap();
 
-      const finish = FINISHES[s.finish] || FINISHES.glossy;
+      const frontFinish = FINISHES[s.finish] || FINISHES.glossy;
+      const backFinish = FINISHES[s.backFinish || s.finish] || FINISHES.glossy;
       const card = parseColor(s.cardColor, [1, 1, 1]);
-      [frontMaterial, backMaterial].forEach(material => {
-        material.roughness = finish.roughness;
-        material.metalness = finish.metalness;
-        material.clearcoat = finish.clearcoat;
-        material.clearcoatRoughness = finish.clearcoatRoughness;
-        material.anisotropy = finish.anisotropy;
+      [
+        [frontMaterial, frontFinish, frontFoilUniforms],
+        [backMaterial, backFinish, backFoilUniforms],
+      ].forEach(([material, faceFinish, foilUniforms]) => {
+        material.roughness = faceFinish.roughness;
+        material.metalness = faceFinish.metalness;
+        material.clearcoat = faceFinish.clearcoat;
+        material.clearcoatRoughness = faceFinish.clearcoatRoughness;
+        material.anisotropy = faceFinish.anisotropy;
+        foilUniforms.foilStrength.value = faceFinish.foil;
+        foilUniforms.foilAspect.value = layout.height / layout.width;
       });
-      foilUniforms.foilStrength.value = finish.foil;
-      foilUniforms.foilAspect.value = layout.height / layout.width;
       edgeMaterial.color.setRGB(card[0] * 0.92, card[1] * 0.92, card[2] * 0.92, THREE.SRGBColorSpace);
-      edgeMaterial.roughness = Math.min(finish.roughness, 0.35);
-      edgeMaterial.metalness = finish.metalness;
+      edgeMaterial.roughness = Math.min(frontFinish.roughness, 0.35);
+      edgeMaterial.metalness = frontFinish.metalness;
       edgeMaterial.clearcoat = 1;
       edgeMaterial.clearcoatRoughness = 0.08;
       const metalLook = METALS[s.metal] || METALS.silver;

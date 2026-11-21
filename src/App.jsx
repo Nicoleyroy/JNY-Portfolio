@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
-import gsap from 'gsap'
 import Lenis from 'lenis'
-import { certificates, portfolio, projects } from './data'
-import { experience } from './data/experience'
-import Folder from './components/Folder'
+import { portfolio, projects } from './data'
 import Lanyard from './components/Lanyard'
 import './App.css'
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('top')
   const [isLoading, setIsLoading] = useState(true)
+  const [wattwiseSlide, setWattwiseSlide] = useState(0)
+  const [houseOfTheDragonSlide, setHouseOfTheDragonSlide] = useState(0)
   const formspreeEndpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT?.trim()
   const [formData, setFormData] = useState({
     name: '',
@@ -36,6 +36,34 @@ function App() {
   }, [])
 
   useEffect(() => {
+    const sections = ['work', 'about', 'contact']
+      .map((id) => document.getElementById(id))
+      .filter(Boolean)
+    if (!sections.length) return undefined
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+        if (visible[0]) setActiveSection(visible[0].target.id)
+      },
+      { rootMargin: '-25% 0px -55%', threshold: [0.05, 0.2, 0.45] },
+    )
+
+    sections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [])
+
+  useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const lenis = new Lenis({
       duration: reducedMotion ? 0 : 1.1,
@@ -43,7 +71,6 @@ function App() {
       anchors: true,
     })
     let frameId
-    let projectObserver
 
     const raf = (time) => {
       lenis.raf(time)
@@ -52,43 +79,6 @@ function App() {
 
     if (!reducedMotion) {
       frameId = window.requestAnimationFrame(raf)
-      gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
-        gsap.from('.hero-copy > *', {
-          y: 18,
-          opacity: 0,
-          duration: 0.65,
-          stagger: 0.09,
-          ease: 'power2.out',
-        })
-        gsap.from('.portrait-frame', {
-          scale: 0.96,
-          opacity: 0,
-          duration: 0.8,
-          delay: 0.15,
-          ease: 'power2.out',
-        })
-
-        const cards = gsap.utils.toArray('.project-card')
-        cards.forEach((card) => {
-          gsap.set(card, { y: 28, opacity: 0 })
-        })
-        projectObserver = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (!entry.isIntersecting) return
-              gsap.to(entry.target, {
-                y: 0,
-                opacity: 1,
-                duration: 0.7,
-                ease: 'power2.out',
-              })
-              projectObserver.unobserve(entry.target)
-            })
-          },
-          { threshold: 0.12 },
-        )
-        cards.forEach((card) => projectObserver.observe(card))
-      })
     }
 
     const closeMenu = () => setMenuOpen(false)
@@ -97,9 +87,7 @@ function App() {
     return () => {
       window.removeEventListener('resize', closeMenu)
       if (frameId) window.cancelAnimationFrame(frameId)
-      if (projectObserver) projectObserver.disconnect()
       lenis.destroy()
-      gsap.matchMedia().revert()
     }
   }, [])
 
@@ -184,7 +172,8 @@ function App() {
       )}
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Joanna Nicole Yroy, back to top">
-          <span>J</span>NY
+          <span>J</span>
+          <strong>NY</strong>
         </a>
         <button
           className="menu-button"
@@ -197,11 +186,10 @@ function App() {
           <span></span><span></span>
         </button>
         <nav id="main-navigation" className={menuOpen ? 'nav-open' : ''} aria-label="Main navigation">
-          <a href="#work" onClick={closeMenu}>Work</a>
-          <a href="#about" onClick={closeMenu}>About</a>
-          <a href="#experience" onClick={closeMenu}>Experience</a>
-          <a href="#certificates" onClick={closeMenu}>Certificates</a>
-          <a href="#contact" onClick={closeMenu}>Contact</a>
+          <a className={activeSection === 'about' ? 'active' : ''} href="#about" onClick={closeMenu} aria-current={activeSection === 'about' ? 'page' : undefined}>About</a>
+          <a className={activeSection === 'work' ? 'active' : ''} href="#work" onClick={closeMenu} aria-current={activeSection === 'work' ? 'page' : undefined}>Work</a>
+          {/* <a className={activeSection === 'certificates' ? 'active' : ''} href="#certificates" onClick={closeMenu} aria-current={activeSection === 'certificates' ? 'page' : undefined}>Certificates</a> */}
+          <a className={`nav-contact ${activeSection === 'contact' ? 'active' : ''}`} href="#contact" onClick={closeMenu} aria-current={activeSection === 'contact' ? 'page' : undefined}>Contact <span aria-hidden="true">↗</span></a>
         </nav>
       </header>
 
@@ -210,7 +198,7 @@ function App() {
           <div className="hero-orb hero-orb-one"></div>
           <div className="hero-orb hero-orb-two"></div>
           <div className="hero-copy">
-            <p className="eyebrow"><span>✦</span> Portfolio 2026</p>
+            <p className="eyebrow"><span>✦</span> Portfolio</p>
             <h1 id="hero-title">{portfolio.name}</h1>
             <p className="headline">{portfolio.headline}</p>
             <p className="hero-intro">{portfolio.intro}</p>
@@ -226,7 +214,8 @@ function App() {
               backImage="/lanyard-card-back.svg"
               strapColor="#b79ab2"
               cardColor="#f7edf1"
-              finish="holographic"
+              finish="matte"
+              backFinish="holographic"
               cornerRadius={0.55}
               size={0.68}
               anchor="center"
@@ -241,71 +230,6 @@ function App() {
               intro
               className="hero-lanyard"
             />
-          </div>
-        </section>
-
-        <section className="work-section section-shell" id="work" aria-labelledby="work-title">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">Selected projects</p>
-              <h2 id="work-title">Featured Work <span aria-hidden="true">♡</span></h2>
-            </div>
-          </div>
-
-          <div className="folder-project-grid" aria-label="Interactive project folders">
-            {projects.map((project, index) => (
-              <div className="folder-project" key={project.id}>
-                <Folder
-                  mode="book"
-                  variant="solid"
-                  color={index % 2 === 0 ? '#ddb5c7' : '#bbb2d1'}
-                  paperColor="#fffaf7"
-                  label={project.name}
-                  tabPosition="center"
-                  layout="spread"
-                  size={0.92}
-                  openOn="click"
-                  defaultOpen={false}
-                  draggable
-                  zoomOnClick
-                  intro
-                  theme="light"
-                  onItemClick={() => undefined}
-                >
-                  <div className="folder-project-page folder-project-cover">
-                    <span className="folder-project-index">0{index + 1}</span>
-                    {project.screenshot ? (
-                      <img src={project.screenshot} alt={project.screenshotAlt} />
-                    ) : (
-                      <div className="folder-project-placeholder" role="img" aria-label={`${project.name} screenshot placeholder`}>
-                        <span>{project.name.slice(0, 1)}</span>
-                      </div>
-                    )}
-                    <strong>{project.name}</strong>
-                    <small>{project.category}</small>
-                  </div>
-
-                  <div className="folder-project-page folder-project-details">
-                    <span className="folder-project-kicker">Overview</span>
-                    <p>{project.description}</p>
-                    <ul>
-                      {project.features.map((feature) => (
-                        <li key={feature}>{feature}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="folder-project-page folder-project-details">
-                    <span className="folder-project-kicker">My contribution</span>
-                    <p><strong>{project.role}</strong></p>
-                    <p>{project.contribution}</p>
-                    <div className="folder-project-tags">
-                      {project.tags.map((tag) => <span key={tag}>{tag}</span>)}
-                    </div>
-                  </div>
-                </Folder>
-              </div>
-            ))}
           </div>
         </section>
 
@@ -336,32 +260,123 @@ function App() {
           </div>
         </section>
 
-        <section className="experience-section section-shell" id="experience" aria-labelledby="experience-title">
-          <div className="experience-heading">
-            <p className="eyebrow">Professional growth</p>
-            <h2 id="experience-title">Experience</h2>
-            <p className="experience-intro">A timeline of team and academic work.</p>
+        <section className="work-section section-shell" id="work" aria-labelledby="work-title">
+          <div className="section-heading">
+            <div>
+              <h2 id="work-title">Projects <span aria-hidden="true">♡</span></h2>
+            </div>
           </div>
 
-          <div className="experience-timeline">
-            {experience.map((item, index) => (
-              <article className="experience-item" key={`${item.project}-${index}`}>
-                <span className="timeline-dot" aria-hidden="true" />
-                <div className="experience-card">
-                  <div className="experience-meta">
-                    <span>{item.context}</span>
-                    {item.date && <time>{item.date}</time>}
+          <div className="project-grid" aria-label="Featured projects">
+            {projects.map((project) => (
+              <article className="project-card" key={project.id}>
+                <div className="project-visual">
+                  {project.id === 'wattwise' && project.screenshots?.length ? (
+                    <div className="project-image-carousel" aria-label="WattWise image carousel">
+                      <img
+                        src={project.screenshots[wattwiseSlide]}
+                        alt={`${project.screenshotAlt} - image ${wattwiseSlide + 1} of ${project.screenshots.length}`}
+                      />
+                      <button
+                        type="button"
+                        className="project-carousel-arrow project-carousel-prev"
+                        aria-label="Previous WattWise image"
+                        onClick={() => setWattwiseSlide((current) => (
+                          current === 0 ? project.screenshots.length - 1 : current - 1
+                        ))}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        className="project-carousel-arrow project-carousel-next"
+                        aria-label="Next WattWise image"
+                        onClick={() => setWattwiseSlide((current) => (
+                          (current + 1) % project.screenshots.length
+                        ))}
+                      >
+                        ›
+                      </button>
+                      <div className="project-carousel-dots" aria-label="Choose WattWise image">
+                        {project.screenshots.map((image, index) => (
+                          <button
+                            key={image}
+                            type="button"
+                            className={wattwiseSlide === index ? 'active' : ''}
+                            aria-label={`Show WattWise image ${index + 1}`}
+                            aria-current={wattwiseSlide === index ? 'true' : undefined}
+                            onClick={() => setWattwiseSlide(index)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : project.id === 'houseofthedragon' && project.screenshots?.length ? (
+                    <div className="project-image-carousel" aria-label="House of the Dragon image carousel">
+                      <img
+                        src={project.screenshots[houseOfTheDragonSlide]}
+                        alt={`${project.screenshotAlt} - image ${houseOfTheDragonSlide + 1} of ${project.screenshots.length}`}
+                      />
+                      <button
+                        type="button"
+                        className="project-carousel-arrow project-carousel-prev"
+                        aria-label="Previous House of the Dragon image"
+                        onClick={() => setHouseOfTheDragonSlide((current) => (
+                          current === 0 ? project.screenshots.length - 1 : current - 1
+                        ))}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        className="project-carousel-arrow project-carousel-next"
+                        aria-label="Next House of the Dragon image"
+                        onClick={() => setHouseOfTheDragonSlide((current) => (
+                          (current + 1) % project.screenshots.length
+                        ))}
+                      >
+                        ›
+                      </button>
+                      <div className="project-carousel-dots" aria-label="Choose House of the Dragon image">
+                        {project.screenshots.map((image, index) => (
+                          <button
+                            key={image}
+                            type="button"
+                            className={houseOfTheDragonSlide === index ? 'active' : ''}
+                            aria-label={`Show House of the Dragon image ${index + 1}`}
+                            aria-current={houseOfTheDragonSlide === index ? 'true' : undefined}
+                            onClick={() => setHouseOfTheDragonSlide(index)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : project.screenshot ? (
+                    <img src={project.screenshot} alt={project.screenshotAlt} />
+                  ) : (
+                    <div className="screenshot-placeholder" role="img" aria-label={`${project.name} project image placeholder`}>
+                      <div className="placeholder-window">
+                        <span className="placeholder-mark" aria-hidden="true">{project.name.slice(0, 1)}</span>
+                        <span className="placeholder-label">Replace with {project.name} screenshot</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="project-content">
+                  <h3>{project.name}</h3>
+                  <p className="project-description">{project.description}</p>
+                  <div className="project-footer">
+                    <ul className="tag-list" aria-label={`${project.name} technologies`}>
+                      {project.technologies.map((technology) => (
+                        <li key={technology}>{technology}</li>
+                      ))}
+                    </ul>
                   </div>
-                  <h3>{item.project}</h3>
-                  <p className="experience-role">{item.role}</p>
-                  <p className="experience-description">{item.description}</p>
                 </div>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="certificates-section section-shell" id="certificates" aria-labelledby="certificates-title">
+        {/* <section className="certificates-section section-shell" id="certificates" aria-labelledby="certificates-title">
           <div className="section-heading">
             <div>
               <p className="eyebrow">Learning & achievements</p>
@@ -400,20 +415,20 @@ function App() {
               </article>
             ))}
           </div>
-        </section>
+        </section> */}
 
         <section className="contact-section section-shell" id="contact" aria-labelledby="contact-title">
           <div className="contact-card">
             <div className="contact-intro">
-              <p className="eyebrow">Let’s connect</p>
-              <h2 id="contact-title">Have a project or<br />opportunity in mind?</h2>
-              <p>I’d love to hear about it.</p>
+
+              <h2 id="contact-title">LET'S WORK TOGETHER.</h2>
+              <p>I'm always interested in exploring new opportunities, collaborating on meaningful projects, and learning about innovative technologies, especially in web development, and IoT solutions. I'm always excited to share ideas, build new things, and grow through new experiences.</p>
               {portfolio.contact.email && (
                 <a className="direct-email-link" href={`mailto:${portfolio.contact.email}`}>
                   Email me directly ↗
                 </a>
               )}
-              <div className="contact-links">
+              {/* <div className="contact-links">
                 {portfolio.contact.github
                   ? <a href={portfolio.contact.github} target="_blank" rel="noreferrer">GitHub ↗</a>
                   : <span>GitHub · coming soon</span>}
@@ -423,7 +438,7 @@ function App() {
                 {portfolio.contact.resume
                   ? <a href={portfolio.contact.resume} download>Résumé ↓</a>
                   : <span>Résumé · coming soon</span>}
-              </div>
+              </div> */}
             </div>
 
             <form className="contact-form" onSubmit={submitContactForm} noValidate>

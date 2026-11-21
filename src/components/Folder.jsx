@@ -1701,6 +1701,7 @@ const Folder = ({
     document.fonts?.ready.then(invalidate);
 
     let observer = null;
+    let introFallback = null;
     if (settingsRef.current.intro && !reduce) {
       state.intro.phase = 'wait';
       root.style.opacity = '0';
@@ -1711,11 +1712,13 @@ const Folder = ({
           entries => {
             if (!entries.some(entry => entry.isIntersecting)) return;
             observer?.disconnect();
+            if (introFallback) window.clearTimeout(introFallback);
             beginIntro();
           },
           { threshold: 0.2 }
         );
         observer.observe(root);
+        introFallback = window.setTimeout(beginIntro, 1400);
       }
     }
 
@@ -1753,6 +1756,7 @@ const Folder = ({
       document.removeEventListener('pointerdown', onDocumentDown);
       document.removeEventListener('keydown', onKey);
       observer?.disconnect();
+      if (introFallback) window.clearTimeout(introFallback);
       engineRef.current = null;
     };
   }, []);
