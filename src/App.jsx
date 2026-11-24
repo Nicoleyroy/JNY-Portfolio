@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Lenis from 'lenis'
-import { portfolio, projects } from './data'
+import { certificates, portfolio, projects } from './data'
 import Lanyard from './components/Lanyard'
 import './App.css'
 
@@ -8,8 +8,12 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('top')
   const [isLoading, setIsLoading] = useState(true)
-  const [wattwiseSlide, setWattwiseSlide] = useState(0)
-  const [houseOfTheDragonSlide, setHouseOfTheDragonSlide] = useState(0)
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = window.localStorage.getItem('portfolio-theme')
+    if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  })
+  const [projectSlides, setProjectSlides] = useState({})
   const formspreeEndpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT?.trim()
   const [formData, setFormData] = useState({
     name: '',
@@ -20,6 +24,12 @@ function App() {
   const [formErrors, setFormErrors] = useState({})
   const [formStatus, setFormStatus] = useState({ type: '', text: '' })
   const [isSending, setIsSending] = useState(false)
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    document.documentElement.style.colorScheme = theme
+    window.localStorage.setItem('portfolio-theme', theme)
+  }, [theme])
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -36,7 +46,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const sections = ['work', 'about', 'contact']
+    const sections = ['work', 'about', 'certificates', 'contact']
       .map((id) => document.getElementById(id))
       .filter(Boolean)
     if (!sections.length) return undefined
@@ -176,6 +186,19 @@ function App() {
           <strong>NY</strong>
         </a>
         <button
+          className="theme-toggle"
+          type="button"
+          role="switch"
+          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          aria-checked={theme === 'dark'}
+          onClick={() => setTheme((current) => current === 'light' ? 'dark' : 'light')}
+        >
+          <span className="theme-toggle-icon" aria-hidden="true">
+            {theme === 'light' ? '☾' : '☀'}
+          </span>
+          <span className="theme-toggle-text">{theme === 'light' ? 'Dark' : 'Light'}</span>
+        </button>
+        <button
           className="menu-button"
           type="button"
           aria-label="Toggle navigation"
@@ -187,8 +210,8 @@ function App() {
         </button>
         <nav id="main-navigation" className={menuOpen ? 'nav-open' : ''} aria-label="Main navigation">
           <a className={activeSection === 'about' ? 'active' : ''} href="#about" onClick={closeMenu} aria-current={activeSection === 'about' ? 'page' : undefined}>About</a>
-          <a className={activeSection === 'work' ? 'active' : ''} href="#work" onClick={closeMenu} aria-current={activeSection === 'work' ? 'page' : undefined}>Work</a>
-          {/* <a className={activeSection === 'certificates' ? 'active' : ''} href="#certificates" onClick={closeMenu} aria-current={activeSection === 'certificates' ? 'page' : undefined}>Certificates</a> */}
+          <a className={activeSection === 'work' ? 'active' : ''} href="#work" onClick={closeMenu} aria-current={activeSection === 'work' ? 'page' : undefined}>Projects</a>
+          <a className={activeSection === 'certificates' ? 'active' : ''} href="#certificates" onClick={closeMenu} aria-current={activeSection === 'certificates' ? 'page' : undefined}>Certificates</a>
           <a className={`nav-contact ${activeSection === 'contact' ? 'active' : ''}`} href="#contact" onClick={closeMenu} aria-current={activeSection === 'contact' ? 'page' : undefined}>Contact <span aria-hidden="true">↗</span></a>
         </nav>
       </header>
@@ -271,94 +294,77 @@ function App() {
             {projects.map((project) => (
               <article className="project-card" key={project.id}>
                 <div className="project-visual">
-                  {project.id === 'wattwise' && project.screenshots?.length ? (
-                    <div className="project-image-carousel" aria-label="WattWise image carousel">
-                      <img
-                        src={project.screenshots[wattwiseSlide]}
-                        alt={`${project.screenshotAlt} - image ${wattwiseSlide + 1} of ${project.screenshots.length}`}
-                      />
-                      <button
-                        type="button"
-                        className="project-carousel-arrow project-carousel-prev"
-                        aria-label="Previous WattWise image"
-                        onClick={() => setWattwiseSlide((current) => (
-                          current === 0 ? project.screenshots.length - 1 : current - 1
-                        ))}
-                      >
-                        ‹
-                      </button>
-                      <button
-                        type="button"
-                        className="project-carousel-arrow project-carousel-next"
-                        aria-label="Next WattWise image"
-                        onClick={() => setWattwiseSlide((current) => (
-                          (current + 1) % project.screenshots.length
-                        ))}
-                      >
-                        ›
-                      </button>
-                      <div className="project-carousel-dots" aria-label="Choose WattWise image">
-                        {project.screenshots.map((image, index) => (
-                          <button
-                            key={image}
-                            type="button"
-                            className={wattwiseSlide === index ? 'active' : ''}
-                            aria-label={`Show WattWise image ${index + 1}`}
-                            aria-current={wattwiseSlide === index ? 'true' : undefined}
-                            onClick={() => setWattwiseSlide(index)}
-                          />
-                        ))}
+                  {(() => {
+                    const images = project.screenshots?.length
+                      ? project.screenshots
+                      : project.screenshot
+                        ? [project.screenshot]
+                        : []
+                    const currentSlide = projectSlides[project.id] || 0
+
+                    if (!images.length) {
+                      return (
+                        <div className="screenshot-placeholder" role="img" aria-label={`${project.name} project image placeholder`}>
+                          <div className="placeholder-window">
+                            <span className="placeholder-mark" aria-hidden="true">{project.name.slice(0, 1)}</span>
+                            <span className="placeholder-label">Replace with {project.name} screenshot</span>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    return (
+                      <div className="project-image-carousel" aria-label={`${project.name} image carousel`}>
+                        <img
+                          src={images[currentSlide % images.length]}
+                          alt={`${project.screenshotAlt} - image ${((currentSlide % images.length) + 1)} of ${images.length}`}
+                        />
+                        {images.length > 1 && (
+                          <>
+                            <button
+                              type="button"
+                              className="project-carousel-arrow project-carousel-prev"
+                              aria-label={`Previous ${project.name} image`}
+                              onClick={() => setProjectSlides((current) => ({
+                                ...current,
+                                [project.id]: current[project.id]
+                                  ? (current[project.id] - 1 + images.length) % images.length
+                                  : images.length - 1,
+                              }))}
+                            >
+                              ‹
+                            </button>
+                            <button
+                              type="button"
+                              className="project-carousel-arrow project-carousel-next"
+                              aria-label={`Next ${project.name} image`}
+                              onClick={() => setProjectSlides((current) => ({
+                                ...current,
+                                [project.id]: ((current[project.id] || 0) + 1) % images.length,
+                              }))}
+                            >
+                              ›
+                            </button>
+                            <div className="project-carousel-dots" aria-label={`Choose ${project.name} image`}>
+                              {images.map((image, index) => (
+                                <button
+                                  key={image}
+                                  type="button"
+                                  className={(currentSlide % images.length) === index ? 'active' : ''}
+                                  aria-label={`Show ${project.name} image ${index + 1}`}
+                                  aria-current={(currentSlide % images.length) === index ? 'true' : undefined}
+                                  onClick={() => setProjectSlides((current) => ({
+                                    ...current,
+                                    [project.id]: index,
+                                  }))}
+                                />
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
-                    </div>
-                  ) : project.id === 'houseofthedragon' && project.screenshots?.length ? (
-                    <div className="project-image-carousel" aria-label="House of the Dragon image carousel">
-                      <img
-                        src={project.screenshots[houseOfTheDragonSlide]}
-                        alt={`${project.screenshotAlt} - image ${houseOfTheDragonSlide + 1} of ${project.screenshots.length}`}
-                      />
-                      <button
-                        type="button"
-                        className="project-carousel-arrow project-carousel-prev"
-                        aria-label="Previous House of the Dragon image"
-                        onClick={() => setHouseOfTheDragonSlide((current) => (
-                          current === 0 ? project.screenshots.length - 1 : current - 1
-                        ))}
-                      >
-                        ‹
-                      </button>
-                      <button
-                        type="button"
-                        className="project-carousel-arrow project-carousel-next"
-                        aria-label="Next House of the Dragon image"
-                        onClick={() => setHouseOfTheDragonSlide((current) => (
-                          (current + 1) % project.screenshots.length
-                        ))}
-                      >
-                        ›
-                      </button>
-                      <div className="project-carousel-dots" aria-label="Choose House of the Dragon image">
-                        {project.screenshots.map((image, index) => (
-                          <button
-                            key={image}
-                            type="button"
-                            className={houseOfTheDragonSlide === index ? 'active' : ''}
-                            aria-label={`Show House of the Dragon image ${index + 1}`}
-                            aria-current={houseOfTheDragonSlide === index ? 'true' : undefined}
-                            onClick={() => setHouseOfTheDragonSlide(index)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ) : project.screenshot ? (
-                    <img src={project.screenshot} alt={project.screenshotAlt} />
-                  ) : (
-                    <div className="screenshot-placeholder" role="img" aria-label={`${project.name} project image placeholder`}>
-                      <div className="placeholder-window">
-                        <span className="placeholder-mark" aria-hidden="true">{project.name.slice(0, 1)}</span>
-                        <span className="placeholder-label">Replace with {project.name} screenshot</span>
-                      </div>
-                    </div>
-                  )}
+                    )
+                  })()}
                 </div>
                 <div className="project-content">
                   <h3>{project.name}</h3>
@@ -376,13 +382,13 @@ function App() {
           </div>
         </section>
 
-        {/* <section className="certificates-section section-shell" id="certificates" aria-labelledby="certificates-title">
+        <section className="certificates-section section-shell" id="certificates" aria-labelledby="certificates-title">
           <div className="section-heading">
             <div>
               <p className="eyebrow">Learning & achievements</p>
               <h2 id="certificates-title">Certificates <span aria-hidden="true">✦</span></h2>
             </div>
-            <p className="section-note">Credentials, courses, and achievements.</p>
+        
           </div>
 
           <div className="certificate-grid">
@@ -404,41 +410,46 @@ function App() {
                   <p className="certificate-year">{certificate.year}</p>
                   <h3>{certificate.title}</h3>
                   <p className="certificate-issuer">{certificate.issuer}</p>
-                  {certificate.file ? (
-                    <a href={certificate.file} target="_blank" rel="noreferrer">
-                      View certificate ↗
-                    </a>
-                  ) : (
-                    <span className="certificate-link-placeholder">Link coming soon</span>
-                  )}
+                
                 </div>
               </article>
             ))}
           </div>
-        </section> */}
+        </section>
 
         <section className="contact-section section-shell" id="contact" aria-labelledby="contact-title">
           <div className="contact-card">
             <div className="contact-intro">
 
               <h2 id="contact-title">LET'S WORK TOGETHER.</h2>
-              <p>I'm always interested in exploring new opportunities, collaborating on meaningful projects, and learning about innovative technologies, especially in web development, and IoT solutions. I'm always excited to share ideas, build new things, and grow through new experiences.</p>
+              <p>I'm always interested in exploring new opportunities, collaborating on meaningful projects, and learning about innovative technologies. I'm always excited to share ideas, build new things, and grow through new experiences.</p>
               {portfolio.contact.email && (
                 <a className="direct-email-link" href={`mailto:${portfolio.contact.email}`}>
                   Email me directly ↗
                 </a>
               )}
-              {/* <div className="contact-links">
+              <div className="contact-links">
                 {portfolio.contact.github
-                  ? <a href={portfolio.contact.github} target="_blank" rel="noreferrer">GitHub ↗</a>
-                  : <span>GitHub · coming soon</span>}
-                {portfolio.contact.linkedin
-                  ? <a href={portfolio.contact.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a>
-                  : <span>LinkedIn · coming soon</span>}
+                  ? <a className="social-link" href={portfolio.contact.github} target="_blank" rel="noreferrer" aria-label="GitHub" title="GitHub">
+                      <svg viewBox="0 0 19 19" aria-hidden="true"><path d="M9.356 1.85C5.05 1.85 1.57 5.356 1.57 9.694a7.84 7.84 0 0 0 5.324 7.44c.387.079.528-.168.528-.376 0-.182-.013-.805-.013-1.454-2.165.467-2.616-.935-2.616-.935-.349-.91-.864-1.143-.864-1.143-.71-.48.051-.48.051-.48.787.051 1.2.805 1.2.805.695 1.194 1.817.857 2.268.649.064-.507.27-.857.49-1.052-1.728-.182-3.545-.857-3.545-3.87 0-.857.31-1.558.8-2.104-.078-.195-.349-1 .077-2.078 0 0 .657-.208 2.14.805a7.5 7.5 0 0 1 1.946-.26c.657 0 1.328.092 1.946.26 1.483-1.013 2.14-.805 2.14-.805.426 1.078.155 1.883.078 2.078.502.546.799 1.247.799 2.104 0 3.013-1.818 3.675-3.558 3.87.284.247.528.714.528 1.454 0 1.052-.012 1.896-.012 2.156 0 .208.142.455.528.377a7.84 7.84 0 0 0 5.324-7.441c.013-4.338-3.48-7.844-7.773-7.844" />
+                    </svg>
+               
+                    </a>
+                  : <span className="social-link social-placeholder" title="GitHub coming soon" aria-label="GitHub coming soon">
+                      <svg viewBox="0 0 19 19" aria-hidden="true"><path d="M9.356 1.85C5.05 1.85 1.57 5.356 1.57 9.694a7.84 7.84 0 0 0 5.324 7.44c.387.079.528-.168.528-.376 0-.182-.013-.805-.013-1.454-2.165.467-2.616-.935-2.616-.935-.349-.91-.864-1.143-.864-1.143-.71-.48.051-.48.051-.48.787.051 1.2.805 1.2.805.695 1.194 1.817.857 2.268.649.064-.507.27-.857.49-1.052-1.728-.182-3.545-.857-3.545-3.87 0-.857.31-1.558.8-2.104-.078-.195-.349-1 .077-2.078 0 0 .657-.208 2.14.805a7.5 7.5 0 0 1 1.946-.26c.657 0 1.328.092 1.946.26 1.483-1.013 2.14-.805 2.14-.805.426 1.078.155 1.883.078 2.078.502.546.799 1.247.799 2.104 0 3.013-1.818 3.675-3.558 3.87.284.247.528.714.528 1.454 0 1.052-.012 1.896-.012 2.156 0 .208.142.455.528.377a7.84 7.84 0 0 0 5.324-7.441c.013-4.338-3.48-7.844-7.773-7.844" />
+                    </svg>
+                   
+                    </span>}
                 {portfolio.contact.resume
-                  ? <a href={portfolio.contact.resume} download>Résumé ↓</a>
-                  : <span>Résumé · coming soon</span>}
-              </div> */}
+                  ? <a className="social-link" href={portfolio.contact.resume} download aria-label="Download résumé" title="Download résumé">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              
+                    </a>
+                  : <span className="social-link social-placeholder" title="Résumé coming soon" aria-label="Résumé coming soon">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                     <span>Résumé coming soon</span>
+                    </span>}
+              </div>
             </div>
 
             <form className="contact-form" onSubmit={submitContactForm} noValidate>

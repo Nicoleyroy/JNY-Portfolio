@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Joanna Nicole P. Yroy — IT student and developer portfolio." />
     <title>Joanna Nicole P. Yroy | Portfolio</title>
+    <script>
+      try {
+        const savedTheme = localStorage.getItem('portfolio-theme')
+        const theme = savedTheme === 'dark' || savedTheme === 'light'
+          ? savedTheme
+          : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        document.documentElement.dataset.theme = theme
+        document.documentElement.style.colorScheme = theme
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

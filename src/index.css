@@ -23,6 +23,47 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root[data-theme='dark'] {
+  --background: #211a24;
+  --surface: #302633;
+  --heading: #f5edf2;
+  --lavender: #b9a6d0;
+  --accent: #d69ab3;
+  --border: #4b3b4b;
+  --cream: var(--background);
+  --blush-pale: var(--surface);
+  --blush: #513449;
+  --lavender-dark: #c3b4d5;
+  --rose: var(--accent);
+  --rose-dark: var(--accent);
+  --plum: var(--heading);
+  --muted-plum: #c8b9c7;
+  --text: #c8b9c7;
+  --line: var(--border);
+  background: var(--background);
+  color: var(--text);
+}
+
+html,
+body,
+.site-header,
+.about-card,
+.skills-panel,
+.project-card,
+.certificate-card,
+.experience-card,
+.contact-card,
+.contact-form,
+button,
+input,
+textarea {
+  transition:
+    background-color 260ms ease,
+    border-color 260ms ease,
+    color 260ms ease,
+    box-shadow 260ms ease;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -41,6 +82,187 @@ body {
     linear-gradient(rgba(79, 48, 68, 0.018) 1px, transparent 1px),
     var(--cream);
   background-size: 100% 32px;
+}
+
+:root[data-theme='dark'] body {
+  background:
+    linear-gradient(rgba(214, 154, 179, 0.018) 1px, transparent 1px),
+    var(--background);
+  background-size: 100% 32px;
+}
+
+:root[data-theme='dark'] .site-header {
+  background: rgba(33, 26, 36, 0.94);
+  border-bottom-color: var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+:root[data-theme='dark'] .site-header nav {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .hero h1 {
+  color: var(--plum);
+}
+
+:root[data-theme='dark'] .hero {
+  background:
+    radial-gradient(circle at 72% 44%, rgba(176, 126, 153, 0.16), transparent 22%),
+    radial-gradient(circle at 86% 28%, rgba(142, 130, 174, 0.12), transparent 20%);
+}
+
+:root[data-theme='dark'] .project-card,
+:root[data-theme='dark'] .certificate-card,
+:root[data-theme='dark'] .contact-card,
+:root[data-theme='dark'] .contact-form,
+:root[data-theme='dark'] .experience-card,
+:root[data-theme='dark'] .placeholder-window,
+:root[data-theme='dark'] .project-details-extra {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .tag-list li,
+:root[data-theme='dark'] .contact-form input,
+:root[data-theme='dark'] .contact-form textarea {
+  background: var(--background);
+  border-color: var(--border);
+  color: var(--heading);
+}
+
+:root[data-theme='dark'] .button-primary,
+:root[data-theme='dark'] .project-details-button,
+:root[data-theme='dark'] .contact-submit {
+  color: var(--background);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+:root[data-theme='dark'] .theme-toggle,
+:root[data-theme='dark'] .skills-panel,
+:root[data-theme='dark'] .project-carousel-arrow,
+:root[data-theme='dark'] .menu-button,
+:root[data-theme='dark'] .contact-links a,
+:root[data-theme='dark'] .contact-links span {
+  color: var(--heading);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .theme-toggle:hover,
+:root[data-theme='dark'] .project-carousel-arrow:hover,
+:root[data-theme='dark'] .menu-button:hover {
+  background: var(--blush);
+  border-color: var(--accent);
+}
+
+:root[data-theme='dark'] .site-header nav a,
+:root[data-theme='dark'] footer,
+:root[data-theme='dark'] footer a,
+:root[data-theme='dark'] .direct-email-link,
+:root[data-theme='dark'] .project-links a,
+:root[data-theme='dark'] .certificate-content a {
+  color: var(--heading);
+}
+
+:root[data-theme='dark'] .site-header nav a:hover,
+:root[data-theme='dark'] .site-header nav a:focus-visible,
+:root[data-theme='dark'] .site-header nav a.active:not(.nav-contact) {
+  color: var(--accent);
+  background: rgba(214, 154, 179, 0.12);
+}
+
+:root[data-theme='dark'] .nav-contact {
+  color: var(--background) !important;
+  background: var(--accent) !important;
+}
+
+:root[data-theme='dark'] .nav-contact:hover,
+:root[data-theme='dark'] .nav-contact:focus-visible,
+:root[data-theme='dark'] .nav-contact.active {
+  color: var(--background) !important;
+  background: var(--rose) !important;
+}
+
+:root[data-theme='dark'] .about-card,
+:root[data-theme='dark'] .certificate-placeholder,
+:root[data-theme='dark'] .contact-card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .project-description,
+:root[data-theme='dark'] .about-copy p,
+:root[data-theme='dark'] .certificate-issuer,
+:root[data-theme='dark'] .certificate-placeholder > span,
+:root[data-theme='dark'] .experience-description,
+:root[data-theme='dark'] .contact-intro > p,
+:root[data-theme='dark'] .contact-card > p {
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .tag-list li,
+:root[data-theme='dark'] .project-carousel-dots button {
+  color: var(--accent);
+  background: var(--background);
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .project-carousel-dots button.active {
+  background: var(--accent);
+}
+
+:root[data-theme='dark'] .project-card:hover {
+  border-color: var(--border);
+  box-shadow: 0 22px 54px rgba(185, 166, 208, 0.12);
+}
+
+:root[data-theme='dark'] .project-card h3,
+:root[data-theme='dark'] .certificate-content h3,
+:root[data-theme='dark'] .section-heading h2,
+:root[data-theme='dark'] .about-heading h2,
+:root[data-theme='dark'] .contact-card h2,
+:root[data-theme='dark'] .form-field label,
+:root[data-theme='dark'] .skills-panel li {
+  color: var(--heading);
+}
+
+:root[data-theme='dark'] .form-field input,
+:root[data-theme='dark'] .form-field textarea {
+  color: var(--heading);
+  background: var(--background);
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .eyebrow,
+:root[data-theme='dark'] .section-note,
+:root[data-theme='dark'] .project-meta,
+:root[data-theme='dark'] .project-links,
+:root[data-theme='dark'] .project-links span,
+:root[data-theme='dark'] .experience-meta,
+:root[data-theme='dark'] .experience-meta time,
+:root[data-theme='dark'] .experience-role,
+:root[data-theme='dark'] .certificate-year,
+:root[data-theme='dark'] .certificate-link-placeholder,
+:root[data-theme='dark'] .form-config-note {
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .section-heading,
+:root[data-theme='dark'] .about-section,
+:root[data-theme='dark'] footer,
+:root[data-theme='dark'] .project-footer,
+:root[data-theme='dark'] .certificate-card,
+:root[data-theme='dark'] .experience-card,
+:root[data-theme='dark'] .contact-card,
+:root[data-theme='dark'] .contact-form {
+  border-color: var(--border);
+}
+
+:root[data-theme='dark'] .loading-screen {
+  color: var(--heading);
+  background: var(--background);
 }
 
 a,

@@ -111,13 +111,44 @@ body.is-loading {
   width: 38px;
   height: 38px;
   border: 1px solid var(--plum);
-  border-radius: 50%;
+  border-radius: 999px;
   font-size: 20px;
 }
 
 .brand strong {
   font-family: var(--serif);
   font-weight: 700;
+}
+
+.theme-toggle {
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  margin-right: 12px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--plum);
+  background: var(--blush-pale);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  background: var(--blush);
+}
+
+.theme-toggle-icon {
+  width: 18px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 17px;
+  line-height: 1;
 }
 
 .site-header nav {
@@ -1059,7 +1090,7 @@ footer {
 
 .certificate-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 22px;
 }
 
@@ -1367,6 +1398,48 @@ footer {
   text-decoration: none;
 }
 
+.contact-links .social-link {
+  width: auto;
+  height: 42px;
+  min-height: 42px;
+  display: inline-grid;
+  place-items: center;
+  grid-auto-flow: column;
+  gap: 8px;
+  padding: 0 14px;
+  border-radius: 50%;
+  transition: transform 180ms ease, color 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.contact-links .social-link svg {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.contact-links .social-link span {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font-size: inherit;
+}
+
+.contact-links a.social-link:hover,
+.contact-links a.social-link:focus-visible {
+  transform: translateY(-2px);
+  color: var(--background);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.contact-links .social-placeholder {
+  opacity: 0.52;
+  cursor: help;
+}
+
 .contact-form {
   width: 100%;
   padding: 28px;
@@ -1533,6 +1606,18 @@ footer {
     margin: 0;
     padding: 0 12px;
     border-radius: 0;
+  }
+
+  .theme-toggle {
+    width: 38px;
+    margin-left: auto;
+    margin-right: 8px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .theme-toggle-text {
+    display: none;
   }
 
   .menu-button {

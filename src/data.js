@@ -1,5 +1,4 @@
 import ifindScreenshot from './assets/ifind.jpg'
-import sasScreenshot from './assets/sass.jpg'
 import sboAttendanceScreenshot from './assets/sboattendance.jpg'
 import wattwiseScreenshot from './assets/wattwise.jpg'
 import wattwiseMobileScreenshot from './assets/wattwise2.jpg'
@@ -11,9 +10,19 @@ import marketSquarePlaceholderScreenshot2 from './assets/marketsquare3.png'
 import marketSquarePlaceholderScreenshot3 from './assets/marketsquare4.png'
 import houseofthedragonScreenshot from './assets/hotd.png'
 import houseofthedragonPlaceholderScreenshot from './assets/hotd1.png'
-import houseofthedragonPlaceholderScreenshot2 from './assets/hotd2.png'
 import houseofthedragonPlaceholderScreenshot3 from './assets/hotd3.png'
 import houseofthedragonPlaceholderScreenshot4 from './assets/hotd4.png'
+import networkingScreenshot from './assets/networking.png'
+import wadhwaniScreenshot from './assets/wadhwani.png'
+import wadhwaniScreenshot2 from './assets/wadhwani2.png'
+import wadhwaniScreenshot3 from './assets/wadhwani3.png'
+import eduProfileScreenshot from './assets/eduprofile1.png'
+import eduProfileScreenshot2 from './assets/eduprofile2.png'
+import eduProfileScreenshot3 from './assets/eduprofile3.png'
+import eduProfileScreenshot4 from './assets/eduprofile4.png'
+import eduProfileScreenshot5 from './assets/eduprofile5.png'
+import resumeFile from './assets/Yroy-Resume.pdf'
+
 
 export const portfolio = {
   name: 'Joanna Nicole P. Yroy',
@@ -23,42 +32,50 @@ export const portfolio = {
   location: 'Bukidnon State University',
   contact: {
     email: '',
-    github: '',
-    linkedin: '',
-    resume: '',
+    github: 'https://github.com/Nicoleyroy?tab=overview&from=2026-10-01&to=2026-10-31',
+    resume: resumeFile,
   },
   skills: [
     'Web Development',
-    'Java',
-    'Android Development',
-    'Team Collaboration',
-    'Project Management',
+    'Software Development',
     'UI/UX Design',
+    'HTML & CSS',
+    'React',
+    'ESP32',
+
   ],
 }
 
 export const certificates = [
   {
-    title: 'Certificate title',
-    issuer: 'Issuing organization',
-    year: 'Year',
-    image: '',
+    title: 'CCNA: Switching, Routing, and Wireless Essentials',
+    issuer: 'Cisco Networking Academy – Bukidnon State University',
+    year: '2025',
+    image: networkingScreenshot,
     file: '',
   },
   {
-    title: 'Certificate title',
-    issuer: 'Issuing organization',
-    year: 'Year',
-    image: '',
+    title: 'Certificate of Proficiency – Ignite Philippines',
+    issuer: 'Wadhwani Global Entrepreneur ',
+    year: '2025',
+    image: wadhwaniScreenshot,
     file: '',
   },
-  {
-    title: 'Certificate title',
-    issuer: 'Issuing organization',
-    year: 'Year',
-    image: '',
+   {
+    title: 'Certificate of Program Completion – Ignite Philippines',
+    issuer: 'Wadhwani Global Entrepreneur ',
+    year: '2025',
+    image: wadhwaniScreenshot2,
     file: '',
   },
+   {
+    title: 'Certificate of Content Completion – Ignite Philippines',
+    issuer: 'Wadhwani Global Entrepreneur ',
+    year: '2025',
+    image: wadhwaniScreenshot3,
+    file: '',
+  },
+
 ]
 
 export const projects = [
@@ -77,7 +94,7 @@ export const projects = [
       'Scheduling',
       'Configurable consumption limits',
     ],
-    technologies: ['ESP32-S3', 'PZEM-004T', 'Firebase Realtime Database', 'MongoDB', 'Arduino'],
+    technologies: ['ESP32-S3', 'PZEM-004T', 'Firebase Realtime Database', 'MongoDB', 'Arduino', 'Vue', 'Tailwind CSS', 'Laravel'],
     role: 'Team Member',
     contribution: 'Developed and contributed to the IoT system as part of a team project.',
     screenshot: wattwiseScreenshot,
@@ -105,27 +122,29 @@ export const projects = [
       'Admin and moderator management',
       'Role-based access control',
     ],
-    technologies: ['React', 'Vite', 'Tailwind CSS', 'Express.js', 'MongoDB', 'Mongoose'],
+    technologies: ['React', 'Vite', 'Tailwind CSS', 'Express.js', 'MongoDB'],
     role: 'Project Manager & Programmer 2',
     contribution: 'Served as Project Manager and Programmer 2, helping coordinate the team while contributing to system implementation.',
     screenshot: ifindScreenshot,
+    screenshots: [ifindScreenshot, '/project-ifind.svg'],
     screenshotAlt: 'iFind lost-and-found management interface',
     github: '',
     demo: '',
   },
   {
     id: 'sas',
-    name: 'SAS',
+    name: 'EduProfile',
     title: 'Student Attendance System',
     category: 'Android Application',
     description:
-      'An attendance application for student organization events that supports registration and QR-based time tracking.',
+      'EduProfile is a multi-tenant school management platform that allows different educational institutions to manage their student records within one SaaS application while keeping each institutions information separate.',
     features: ['Student registration', 'QR-based attendance', 'AM/PM time tracking'],
-    technologies: ['Android', 'QR Code', 'Java'],
+    technologies: ['Laravel', 'PHP', 'Multi-Tenant SaaS Architecture', 'RBAC'],
     role: 'Team Member',
     contribution: 'Contributed to the team Android application.',
-    screenshot: sasScreenshot,
-    screenshotAlt: 'SAS Android attendance application preview',
+    screenshot: eduProfileScreenshot,
+    screenshots: [eduProfileScreenshot, eduProfileScreenshot2, eduProfileScreenshot3, eduProfileScreenshot4, eduProfileScreenshot5],
+    screenshotAlt: 'EduProfile Android attendance application preview',
     github: '',
     demo: '',
   },
@@ -135,7 +154,7 @@ export const projects = [
     title: 'MarketSquare UI/UX Design',
     category: 'UI/UX Design',
     description:
-      'A marketplace interface designed to provide clear navigation and a friendly shopping experience.',
+      'MarketSquare is a UI/UX mobile application prototype designed to connect local buyers and sellers within their communities. It provides a user-friendly shopping experience through product browsing, location-based searching, direct messaging, and seller ratings and reviews.',
     features: ['Marketplace layout', 'User-friendly browsing', 'Visual design system'],
     technologies: ['Figma', 'UI/UX Design'],
     role: 'UI/UX Designer',
@@ -163,6 +182,7 @@ export const projects = [
     role: 'Project Manager & Programmer 2',
     contribution: 'Served as Project Manager and Programmer 2, helping coordinate the team while contributing to system implementation.',
     screenshot: sboAttendanceScreenshot,
+    screenshots: [sboAttendanceScreenshot],
     screenshotAlt: 'SBO Attendance system interface preview',
     github: '',
     demo: '',
@@ -182,7 +202,6 @@ export const projects = [
     screenshots: [
       houseofthedragonScreenshot,
       houseofthedragonPlaceholderScreenshot,
-      houseofthedragonPlaceholderScreenshot2,
       houseofthedragonPlaceholderScreenshot3,
       houseofthedragonPlaceholderScreenshot4,
     ],
